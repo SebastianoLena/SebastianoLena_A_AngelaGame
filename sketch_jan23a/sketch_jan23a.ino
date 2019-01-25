@@ -1,6 +1,7 @@
 int risDaRaggiungere; //Indica il risultato a cui bisogna arrivare per vincere
 char mossaGiocatore; //Indica il numero che ha inserito il giocatore durante la sua mossa
-int mossaAppoggio; //Questa sarà la variabile d'appoggio per le mosse del giocatore
+int mossaAppoggio1; //Questa sarà la variabile d'appoggio per le mosse del giocatore
+int mossaAppoggio2; //Questa variabile verrà utilizzata per impedire di inserire i numeri che equivalgono alla faccia opposta del dado es: 1-6 2-5
 int numeroCorrente; //Indica il numero corrente a cui si è arrivati
 int turno; // turno = 0 (giocatore 1) | turno = 1 (giocatore 2)
 bool finito; //Variabile booleana che verrà utilizzata nei cicli
@@ -19,7 +20,8 @@ void setup()
   finito = false;
   cont = 0;
   mossaGiocatore = '0';
-  mossaAppoggio = 0;
+  mossaAppoggio1 = -1;
+  mossaAppoggio2 = -1;
   numTurni = 0;
   istruzioni = "";
 }
@@ -34,13 +36,14 @@ void LetturaMossa() //Metodo che consente la lettura dell'input effettuato dal g
 {
   while (!finito)
   {
+    mossaAppoggio2 = mossaAppoggio1;
     mossaGiocatore = Serial.readString().toInt();
-    mossaAppoggio = mossaGiocatore;
-    if (numTurni == 0 && mossaAppoggio >= 0 && mossaAppoggio < 7)
+    mossaAppoggio1 = mossaGiocatore;
+    if (numTurni == 0 && mossaAppoggio1 >= 0  && mossaAppoggio1 < 7 && mossaAppoggio1 != mossaAppoggio2 && mossaAppoggio1 != (7 - mossaAppoggio2))
     {
      finito = true;
     }
-    else if (mossaAppoggio > 0 && mossaAppoggio < 7)
+    else if (mossaAppoggio1 > 0 && mossaAppoggio1 < 7 && mossaAppoggio1 != mossaAppoggio2 && mossaAppoggio1 != (7 - mossaAppoggio2))
     {
      finito = true;
     }
@@ -51,15 +54,25 @@ void LetturaMossa() //Metodo che consente la lettura dell'input effettuato dal g
 void FaiMossa() //Permette al giocatore di fare la sua mossa
 {
   LetturaMossa();
-  Serial.println(mossaAppoggio, DEC);
+  if (turno == 0)
+  {
+    istruzioni = "Mossa Giocatore 1: ";
+  }
+  else
+  {
+    istruzioni = "Mossa Giocatore 2: ";
+  }
+  Serial.print(istruzioni);
+  Serial.println(mossaAppoggio1);
   AggiungiMossaAlRisultato();  
   AzzeramentoMosseDelGiocatore();
 }
 
 void AggiungiMossaAlRisultato() //Aggiunge la mossa appena fatta al risultato corrente
 {
-  numeroCorrente = numeroCorrente + mossaAppoggio;
-  istruzioni = "Numero Corrente: " + numeroCorrente;
+  numeroCorrente = numeroCorrente + mossaAppoggio1;
+  istruzioni = "Numero Corrente: ";
+  Serial.print(istruzioni);
   Serial.println(numeroCorrente);
   DeterminaChiVince();
   PassaTurno();
@@ -68,7 +81,7 @@ void AggiungiMossaAlRisultato() //Aggiunge la mossa appena fatta al risultato co
 void AzzeramentoMosseDelGiocatore() //Metodo che azzera la mossa appena fatta dal giocatore
 {
   mossaGiocatore = '0';
-  mossaAppoggio = 0;
+  mossaAppoggio1 = 0;
 }
 
 void PassaTurno()
@@ -89,25 +102,34 @@ void DeterminaChiVince() //Metodo che determina chi vince in base a chi ha esegu
   if (turno == 0 && numeroCorrente == risDaRaggiungere)
   {
     Serial.println("Vince il Giocatore 1");
+    Serial.println("");
+    TerminaPartita();
   }
   else if (turno == 1 && numeroCorrente == risDaRaggiungere)
   {
     Serial.println("Vince il Giocatore 2");
+    Serial.println("");
+    TerminaPartita();
   }
   else if (turno == 0 && numeroCorrente > risDaRaggiungere)
   {
     Serial.println("Vince il Giocatore 2");
+    Serial.println("");
+    TerminaPartita();
   }
   else if (turno == 1 && numeroCorrente > risDaRaggiungere)
   {
-  Serial.println("Vince il Giocatore 1"); 
+    Serial.println("Vince il Giocatore 1");
+    Serial.println(""); 
+    TerminaPartita();
   }
 }
 
 void TerminaPartita() //Metodo che termina la partita e riazzera le mosse
 {
-  risDaRaggiungere = 0;
-  numeroCorrente = 0;
   turno = 0;
   numTurni = 0;
+  mossaAppoggio1 = -1;
+  mossaAppoggio2 = -1;
+  numeroCorrente = 0;
 }
