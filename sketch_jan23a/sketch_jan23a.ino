@@ -33,7 +33,8 @@ void loop()
 {
   // put your main code here, to run repeatedly:
   ScegliRisDaRaggiungere();
-  FaiMossa();
+  //FaiMossa();
+  LetturaMossa();
 }
 
 void ScegliRisDaRaggiungere()
@@ -61,26 +62,22 @@ void ScegliRisDaRaggiungere()
 }
 void LetturaMossa() //Metodo che consente la lettura dell'input effettuato dal giocatore
 {
-  while (!finito)
-  {
     mossaAppoggio2 = mossaAppoggio1;
+    Serial.available();
     mossaGiocatore = Serial.readString().toInt();
     mossaAppoggio1 = mossaGiocatore;
     if (numTurni == 0 && mossaAppoggio1 >= 0  && mossaAppoggio1 < 7 && mossaAppoggio1 != mossaAppoggio2 && mossaAppoggio1 != (7 - mossaAppoggio2))
     {
-     finito = true;
+      FaiMossa();
     }
     else if (mossaAppoggio1 > 0 && mossaAppoggio1 < 7 && mossaAppoggio1 != mossaAppoggio2 && mossaAppoggio1 != (7 - mossaAppoggio2))
     {
-     finito = true;
+      FaiMossa();
     }
-  }
-  finito = false;
 }
 
 void FaiMossa() //Permette al giocatore di fare la sua mossa
 {
-  LetturaMossa();
   if (turno == 0)
   {
     istruzioni = "Mossa Giocatore 1: ";
