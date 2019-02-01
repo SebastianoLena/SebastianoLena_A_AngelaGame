@@ -5,7 +5,6 @@ int numeroCorrente; //Indica il numero corrente a cui si è arrivati
 int turno; // turno = 0 (giocatore 1) | turno = 1 (giocatore 2)
 int turnoIniziale; //Indica il turno con cui è cominciato l'ultima partita effettuata
 bool finito; //Variabile booleana che verrà utilizzata nei cicli
-int cont; //Contatore che verrà utilizzato nei cicli
 int numTurni; //Variabile che terrà conto del numero dei turni della partita es: Gioc.2 fa la sua mossa e il turno aumenta di 1
 String istruzioni; //Stringa che andrà a visualizzare nel monitor seriale le informazioni necessarie
 
@@ -19,7 +18,6 @@ void setup()
   turno = 0;
   turnoIniziale = 0;
   finito = false;
-  cont = 0;
   mossaGiocatore = -1;
   mossaAppoggio = 0;
   numTurni = 0;
