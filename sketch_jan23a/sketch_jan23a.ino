@@ -1,8 +1,6 @@
 int risDaRaggiungere; //Indica il risultato a cui bisogna arrivare per vincere
-char risDaRaggiungere2; //Permette ai giocatori di inserire il risultato da raggiungere
-char mossaGiocatore; //Indica il numero che ha inserito il giocatore durante la sua mossa
-int mossaAppoggio1; //Questa sarà la variabile d'appoggio per le mosse del giocatore
-int mossaAppoggio2; //Questa variabile verrà utilizzata per impedire di inserire i numeri che equivalgono alla faccia opposta del dado es: 1-6 2-5
+int mossaGiocatore; //Indica il numero che ha inserito il giocatore durante la sua mossa
+int mossaAppoggio; //Questa variabile verrà utilizzata per impedire di inserire i numeri che equivalgono alla faccia opposta del dado es: 1-6 2-5
 int numeroCorrente; //Indica il numero corrente a cui si è arrivati
 int turno; // turno = 0 (giocatore 1) | turno = 1 (giocatore 2)
 int turnoIniziale; //Indica il turno con cui è cominciato l'ultima partita effettuata
@@ -22,9 +20,8 @@ void setup()
   turnoIniziale = 0;
   finito = false;
   cont = 0;
-  mossaGiocatore = '7';
-  mossaAppoggio1 = -1;
-  mossaAppoggio2 = -1;
+  mossaGiocatore = -1;
+  mossaAppoggio = 0;
   numTurni = 0;
   istruzioni = "";
 }
@@ -44,35 +41,40 @@ void ScegliRisDaRaggiungere()
     Serial.println("SELEZIONA IL RISULTATO DA RAGGIUNGERE DA 30 A 99");
     while(!finito)
     {
-     if (risDaRaggiungere >= 30 && risDaRaggiungere < 100)
+      while(Serial.available() == 0){}
+      risDaRaggiungere = Serial.parseInt();
+      if (risDaRaggiungere >= 30 && risDaRaggiungere < 100)
       {
+        Serial.println("");
+        Serial.print("Il risultato da raggiungere è: ");
+        Serial.println(risDaRaggiungere);
+        Serial.println("Comincia la partita");
         finito = true;
       }
       else
       {
-        risDaRaggiungere2 = Serial.readString().toInt();
-        risDaRaggiungere = risDaRaggiungere2;
-      }  
+       Serial.println("Risultato Non Valido");
+      }   
     }
-    Serial.println("");
-    Serial.print("Il risultato da raggiungere è: ");
-    Serial.println(risDaRaggiungere);
     finito = false;
   }
 }
 void LetturaMossa() //Metodo che consente la lettura dell'input effettuato dal giocatore
 {
-    mossaAppoggio2 = mossaAppoggio1;
-    Serial.available();
-    mossaGiocatore = Serial.readString().toInt();
-    mossaAppoggio1 = mossaGiocatore;
-    if (numTurni == 0 && mossaAppoggio1 >= 0  && mossaAppoggio1 < 7 && mossaAppoggio1 != mossaAppoggio2 && mossaAppoggio1 != (7 - mossaAppoggio2))
+    mossaAppoggio = mossaGiocatore;
+    while (Serial.available() == 0){}
+    mossaGiocatore = Serial.parseInt();
+    if (numTurni == 0 && mossaGiocatore >= 0  && mossaGiocatore < 7 && mossaGiocatore != mossaAppoggio && mossaGiocatore != (7 - mossaAppoggio))
     {
       FaiMossa();
     }
-    else if (mossaAppoggio1 > 0 && mossaAppoggio1 < 7 && mossaAppoggio1 != mossaAppoggio2 && mossaAppoggio1 != (7 - mossaAppoggio2))
+    else if (mossaGiocatore > 0  && mossaGiocatore < 7 && mossaGiocatore != mossaAppoggio && mossaGiocatore != (7 - mossaAppoggio))
     {
       FaiMossa();
+    }
+    else
+    {
+      Serial.println("Mossa Non Valida");
     }
 }
 
@@ -87,13 +89,13 @@ void FaiMossa() //Permette al giocatore di fare la sua mossa
     istruzioni = "Mossa Giocatore 2: ";
   }
   Serial.print(istruzioni);
-  Serial.println(mossaAppoggio1);
+  Serial.println(mossaGiocatore);
   AggiungiMossaAlRisultato();  
 }
 
 void AggiungiMossaAlRisultato() //Aggiunge la mossa appena fatta al risultato corrente
 {
-  numeroCorrente = numeroCorrente + mossaAppoggio1;
+  numeroCorrente = numeroCorrente + mossaGiocatore;
   istruzioni = "Numero Corrente: ";
   Serial.print(istruzioni);
   Serial.println(numeroCorrente);
@@ -145,8 +147,8 @@ void DeterminaChiVince() //Metodo che determina chi vince in base a chi ha esegu
     Serial.println("VINCE IL GIOCATORE 2");
     Serial.println("");
     TerminaPartita();
-    CambiaTurnoIniziale();
     ScegliRisDaRaggiungere();
+    CambiaTurnoIniziale();
   }
   else if (turno == 0 && numeroCorrente > risDaRaggiungere)
   {
@@ -169,8 +171,7 @@ void DeterminaChiVince() //Metodo che determina chi vince in base a chi ha esegu
 void TerminaPartita() //Metodo che termina la partita
 {
   numTurni = 0;
-  mossaAppoggio1 = -1;
-  mossaAppoggio2 = -1;
+  mossaAppoggio = -1;
   numeroCorrente = 0;
   risDaRaggiungere = 0;
 }
